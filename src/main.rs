@@ -1,42 +1,35 @@
-use std::io::{self, Write};
+mod rng;
+
+use std::io;
+use std::time::{SystemTime, UNIX_EPOCH};
+use rng::Rng;
+use std::cmp::Ordering;
 
 fn main() {
-    // Membuat variabel mutable untuk menyimpan input dari pengguna
-    let mut sisi1 = String::new();
-    let mut sisi2 = String::new();
+    // Ambil seed dari waktu saat ini untuk menghasilkan angka acak yang berbeda setiap kali program dijalankan
+    let seed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().subsec_nanos() as u32;
+    let mut tebak = String::new();
+    let mut rng = Rng::new(seed);
+    let jawaban = rng.range(1, 101);
 
-    // Prompt pengguna untuk memasukkan sisi-sisi persegi panjang
-    print!("Masukkan sisi 1: ");
-    // Flush stdout untuk memastikan prompt ditampilkan sebelum membaca input
-    io::stdout().flush().unwrap();
-    // Baca input dari pengguna dan simpan ke variabel sisi1
-    io::stdin()
-        .read_line(&mut sisi1)
-        .expect("Gagal membaca input");
-    print!("Masukkan sisi 2: ");
-    io::stdout().flush().unwrap();
-    io::stdin()
-        .read_line(&mut sisi2)
-        .expect("Gagal membaca input"); 
+    println!("Tebak angka!");
+    println!("Masukkan angka tebakan: ");
 
-    // Konversi input dari String ke f64 dan tangani kemungkinan kesalahan konversi
-    let sisi1: f64 = sisi1.trim().parse().expect("Gagal mengonversi sisi 1");
-    let sisi2: f64 = sisi2.trim().parse().expect("Gagal mengonversi sisi 2");
+    // Baca input tebakan dari pemain
+    io::stdin().read_line(&mut tebak).expect("X");
 
-    println!("Hasil penjumlahan: {}", sisi1 * sisi2);
+    println!("Tebakan: {}", tebak);
+
+    // Konversi input tebakan menjadi tipe data yang sesuai
+    let tebak: i32 = tebak.trim().parse().expect("X");
+    let jawaban: i32 = jawaban as i32;
+
+    // Periksa tebakan dan berikan feedback kepada pemain
+    match tebak.cmp(&jawaban) {
+        Ordering::Less if (jawaban - tebak).abs() <= 2 => println!("Tebakanmu hampir benar!, Jawaban: {}, Tebakan: {}", jawaban, tebak),
+        Ordering::Less => println!("Tebakanmu terlalu kecil!, Jawaban: {}, Tebakan: {}", jawaban, tebak),
+        Ordering::Greater if (tebak - jawaban).abs() <= 2 => println!("Tebakanmu hampir benar!, Jawaban: {}, Tebakan: {}", jawaban, tebak),
+        Ordering::Greater => println!("Tebakanmu terlalu besar!, Jawaban: {}, Tebakan: {}", jawaban, tebak),
+        Ordering::Equal => println!("Selamat! Tebakanmu benar., Jawaban: {}, Tebakan: {}", jawaban, tebak)
+    }
 }
-
-// Latihan Variable
-//fn main() {
-//    Variabel adalah tempat untuk menyimpan data. Variabel dapat memiliki tipe data yang berbeda, seperti integer, float, string, dan lain-lain. Variabel juga dapat diubah nilainya selama program berjalan, tergantung pada kebutuhan program. Berikut adalah contoh penggunaan variabel dalam bahasa pemrograman Rust:
-//    let nama = "Aniko";
-//    let umur = 21;
-//    let hobi = "Gaming";
-//    let impian = "Menjadi software engineer dan reverse engineer";
-//    let tinggi = 160.0;
-//
-//    print!(
-//        "Nama: {} \nUmur: {} \nTinggi: {} \nHobi: {} \nImpian: {}",
-//        nama, umur, tinggi, hobi, impian
-//    );
-//}
